@@ -27,28 +27,48 @@ fn set_window_mode(window: WebviewWindow, mode: String) -> Result<(), String> {
         _ => (160.0, 160.0), // "idle"
     };
 
-    // Calculate new position keeping bottom-right fixed
+    // Calculate new position keeping bottom-right corner anchored
     let mut new_x = log_pos.x + log_size.width - target_w;
     let mut new_y = log_pos.y + log_size.height - target_h;
 
-    // Safety bounds
-    if new_x < 10.0 {
-        new_x = 10.0;
+    // Get current monitor boundaries to prevent off-screen positioning
+    let (max_w, max_h) = if let Ok(Some(monitor)) = window.current_monitor() {
+        let m_size = monitor.size().to_logical::<f64>(scale);
+        let m_pos = monitor.position().to_logical::<f64>(scale);
+        (m_pos.x + m_size.width, m_pos.y + m_size.height)
+    } else if let Ok(Some(monitor)) = window.primary_monitor() {
+        let m_size = monitor.size().to_logical::<f64>(scale);
+        (m_size.width, m_size.height)
+    } else {
+        (1920.0, 1080.0)
+    };
+
+    // Clamp coordinates safely within screen boundaries
+    if new_x > max_w - target_w - 16.0 {
+        new_x = max_w - target_w - 16.0;
     }
-    if new_y < 10.0 {
-        new_y = 10.0;
+    if new_x < 16.0 {
+        new_x = 16.0;
+    }
+
+    if new_y > max_h - target_h - 48.0 {
+        new_y = max_h - target_h - 48.0;
+    }
+    if new_y < 16.0 {
+        new_y = 16.0;
     }
 
     println!(
-        "[WaitMate] set_window_mode: '{}' -> ({}x{}) at ({:.0}, {:.0})",
-        mode, target_w, target_h, new_x, new_y
+        "[WaitMate] set_window_mode: '{}' -> ({:.0}x{:.0}) at ({:.0}, {:.0}) (screen bounds: {:.0}x{:.0})",
+        mode, target_w, target_h, new_x, new_y, max_w, max_h
     );
 
     let _ = window.set_size(tauri::Size::Logical(LogicalSize::new(target_w, target_h)));
     let _ = window.set_position(tauri::Position::Logical(LogicalPosition::new(new_x, new_y)));
+    let _ = window.show();
+    let _ = window.set_always_on_top(true);
 
     if mode == "active" {
-        let _ = window.show();
         let _ = window.unminimize();
         let _ = window.set_focus();
     }
