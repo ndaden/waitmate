@@ -27,40 +27,58 @@ fn set_window_mode(window: WebviewWindow, mode: String) -> Result<(), String> {
         _ => (160.0, 160.0), // "idle"
     };
 
-    // Calculate new position keeping bottom-right corner anchored
+    // Calculate candidate new position keeping bottom-right corner anchored
     let mut new_x = log_pos.x + log_size.width - target_w;
     let mut new_y = log_pos.y + log_size.height - target_h;
 
-    // Get current monitor boundaries to prevent off-screen positioning
-    let (max_w, max_h) = if let Ok(Some(monitor)) = window.current_monitor() {
-        let m_size = monitor.size().to_logical::<f64>(scale);
-        let m_pos = monitor.position().to_logical::<f64>(scale);
-        (m_pos.x + m_size.width, m_pos.y + m_size.height)
-    } else if let Ok(Some(monitor)) = window.primary_monitor() {
-        let m_size = monitor.size().to_logical::<f64>(scale);
-        (m_size.width, m_size.height)
-    } else {
-        (1920.0, 1080.0)
+    // Determine current monitor bounds accurately in multi-monitor setups
+    let (mon_min_x, mon_max_x, mon_min_y, mon_max_y) = {
+        // Find monitor containing the center point of the window in physical coordinates
+        let center_x = phys_pos.x + (phys_size.width as i32) / 2;
+        let center_y = phys_pos.y + (phys_size.height as i32) / 2;
+
+        let mut target_monitor = None;
+        if let Ok(monitors) = window.available_monitors() {
+            for m in monitors {
+                let p = m.position();
+                let s = m.size();
+                if center_x >= p.x
+                    && center_x < p.x + (s.width as i32)
+                    && center_y >= p.y
+                    && center_y < p.y + (s.height as i32)
+                {
+                    target_monitor = Some(m);
+                    break;
+                }
+            }
+        }
+
+        if target_monitor.is_none() {
+            target_monitor = window.current_monitor().ok().flatten().or_else(|| window.primary_monitor().ok().flatten());
+        }
+
+        if let Some(m) = target_monitor {
+            let m_scale = m.scale_factor();
+            let m_pos = m.position().to_logical::<f64>(m_scale);
+            let m_size = m.size().to_logical::<f64>(m_scale);
+
+            let min_x = m_pos.x + 12.0;
+            let max_x = (m_pos.x + m_size.width - target_w - 12.0).max(min_x);
+            let min_y = m_pos.y + 12.0;
+            let max_y = (m_pos.y + m_size.height - target_h - 36.0).max(min_y);
+            (min_x, max_x, min_y, max_y)
+        } else {
+            (12.0, 1920.0 - target_w - 12.0, 12.0, 1080.0 - target_h - 36.0)
+        }
     };
 
-    // Clamp coordinates safely within screen boundaries
-    if new_x > max_w - target_w - 16.0 {
-        new_x = max_w - target_w - 16.0;
-    }
-    if new_x < 16.0 {
-        new_x = 16.0;
-    }
-
-    if new_y > max_h - target_h - 48.0 {
-        new_y = max_h - target_h - 48.0;
-    }
-    if new_y < 16.0 {
-        new_y = 16.0;
-    }
+    // Clamp coordinates strictly within the current monitor bounds
+    new_x = new_x.clamp(mon_min_x, mon_max_x);
+    new_y = new_y.clamp(mon_min_y, mon_max_y);
 
     println!(
-        "[WaitMate] set_window_mode: '{}' -> ({:.0}x{:.0}) at ({:.0}, {:.0}) (screen bounds: {:.0}x{:.0})",
-        mode, target_w, target_h, new_x, new_y, max_w, max_h
+        "[WaitMate] set_window_mode: '{}' -> ({:.0}x{:.0}) at ({:.0}, {:.0}) [Monitor Bounds: X[{:.0}..{:.0}], Y[{:.0}..{:.0}]]",
+        mode, target_w, target_h, new_x, new_y, mon_min_x, mon_max_x, mon_min_y, mon_max_y
     );
 
     let _ = window.set_size(tauri::Size::Logical(LogicalSize::new(target_w, target_h)));
