@@ -25,6 +25,21 @@ export function useWaitMate() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [keepOpen, setKeepOpen] = useState<boolean>(() => {
+    const saved = localStorage.getItem('waitmate_keep_open');
+    return saved ? JSON.parse(saved) : false; // Par défaut : fermeture automatique
+  });
+
+  const keepOpenRef = useRef(keepOpen);
+  useEffect(() => {
+    keepOpenRef.current = keepOpen;
+    localStorage.setItem('waitmate_keep_open', JSON.stringify(keepOpen));
+  }, [keepOpen]);
+
+  const toggleKeepOpen = useCallback(() => {
+    setKeepOpen((prev) => !prev);
+  }, []);
+
   // Helper pour ajuster la taille de la fenêtre selon l'état
   const updateWindowMode = useCallback(async (newMood: CompanionMood) => {
     try {
@@ -35,15 +50,12 @@ export function useWaitMate() {
     }
   }, []);
 
-  // Déclencher la fin de session et le retour immédiat en Idle
+  // Déclencher la fin de session et le retour en Idle (sauf si keepOpen est activé)
   const handleStopAi = useCallback((payload?: StopPayload) => {
     if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
     if (timerRef.current) clearInterval(timerRef.current);
 
     setStopPayload(payload || { success: true });
-    setMood('idle');
-    setStartPayload(null);
-    updateWindowMode('idle');
 
     // Déclencher une pluie de confettis discrète
     try {
@@ -56,6 +68,16 @@ export function useWaitMate() {
     } catch (e) {
       console.error(e);
     }
+
+    // Si l'utilisateur a choisi de garder la fenêtre ouverte, on ne replie pas le panneau
+    if (keepOpenRef.current) {
+      console.log('[WaitMate] IA terminée mais "Keep Open" est activé -> la fenêtre reste ouverte.');
+      return;
+    }
+
+    setMood('idle');
+    setStartPayload(null);
+    updateWindowMode('idle');
   }, [updateWindowMode]);
 
   // Déclencher le début d'une session IA
@@ -204,6 +226,8 @@ export function useWaitMate() {
     stats,
     startPayload,
     stopPayload,
+    keepOpen,
+    toggleKeepOpen,
     registerClick,
     triggerManualStart,
     triggerManualStop,

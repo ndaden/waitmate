@@ -10,6 +10,8 @@ export function App() {
     stats,
     startPayload,
     stopPayload,
+    keepOpen,
+    toggleKeepOpen,
     triggerManualStart,
     dismissActiveMode,
   } = useWaitMate();
@@ -22,6 +24,8 @@ export function App() {
           <MiniGame
             stats={stats}
             startPayload={startPayload}
+            keepOpen={keepOpen}
+            onToggleKeepOpen={toggleKeepOpen}
             onClose={dismissActiveMode}
           />
         </div>

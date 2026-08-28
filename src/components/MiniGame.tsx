@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Clock, GripHorizontal, Gamepad2, X, ChevronRight, ArrowLeft, Video } from 'lucide-react';
+import { Clock, GripHorizontal, Gamepad2, X, ChevronRight, ArrowLeft, Video, Pin } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { GameStats, StartPayload } from '../types';
 import { SnakeGame } from './SnakeGame';
@@ -8,6 +8,8 @@ import { YouTubePlayer } from './YouTubePlayer';
 interface MiniGameProps {
   stats: GameStats;
   startPayload: StartPayload | null;
+  keepOpen?: boolean;
+  onToggleKeepOpen?: () => void;
   onClose: () => void;
 }
 
@@ -16,6 +18,8 @@ type ActiveView = 'hub' | 'snake' | 'youtube';
 export const MiniGame: React.FC<MiniGameProps> = ({
   stats,
   startPayload,
+  keepOpen = false,
+  onToggleKeepOpen,
   onClose,
 }) => {
   const [view, setView] = useState<ActiveView>('hub');
@@ -74,6 +78,33 @@ export const MiniGame: React.FC<MiniGameProps> = ({
         </div>
 
         <div className="flex items-center space-x-1.5">
+          {/* Bouton Garder Ouvert (Pin / Auto-close) */}
+          {onToggleKeepOpen && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleKeepOpen();
+              }}
+              className={`flex items-center space-x-1 px-1.5 py-0.5 rounded-lg border text-[10px] font-medium transition-all cursor-pointer active:scale-95 ${
+                keepOpen
+                  ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300 shadow-xs'
+                  : 'bg-slate-900/90 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+              }`}
+              title={
+                keepOpen
+                  ? "Garder ouvert : Activé (ne se fermera pas à la fin de la réponse IA)"
+                  : "Fermeture automatique : Activée (cliquez pour garder ouvert)"
+              }
+            >
+              <Pin
+                className={`w-3 h-3 transition-transform ${
+                  keepOpen ? 'fill-cyan-400 text-cyan-400 -rotate-45' : 'text-slate-400'
+                }`}
+              />
+              <span className="text-[10px]">{keepOpen ? 'Pinned' : 'Auto'}</span>
+            </button>
+          )}
+
           <div className="flex items-center space-x-1 px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-xs font-mono text-slate-300">
             <Clock className="w-3 h-3 text-slate-400" />
             <span>{formatTime(stats.elapsedSeconds)}</span>
