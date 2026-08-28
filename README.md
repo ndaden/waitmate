@@ -12,32 +12,31 @@
   <img src="https://img.shields.io/badge/License-MIT-emerald?style=flat-square" alt="License" />
 </p>
 
+<div align="center">
+  <img src="assets/hero-realistic-screen.png" alt="WaitMate in Realistic Desktop Context" width="100%" />
+</div>
+
 ---
 
-## 📸 Real App Screenshots
+## 📸 Real Desktop Showcase
 
 <div align="center">
   <table>
     <tr>
-      <td align="center" width="25%">
-        <img src="assets/screenshot-idle.png" alt="Idle State" width="100%" />
+      <td align="center" width="33%">
+        <img src="assets/screenshot-desktop-idle.png" alt="Idle Desktop State" width="100%" />
         <br />
-        <strong>1. Idle State (160×160)</strong>
+        <strong>1. Discreet Idle Companion</strong>
       </td>
-      <td align="center" width="25%">
-        <img src="assets/screenshot-menu.png" alt="Activity Hub" width="100%" />
+      <td align="center" width="33%">
+        <img src="assets/screenshot-desktop-youtube.png" alt="Active Ambient YouTube" width="100%" />
         <br />
-        <strong>2. Activity Hub</strong>
+        <strong>2. Ambient Lo-Fi & Video</strong>
       </td>
-      <td align="center" width="25%">
-        <img src="assets/screenshot-snake.png" alt="Snake Arcade" width="100%" />
+      <td align="center" width="33%">
+        <img src="assets/screenshot-desktop-snake.png" alt="Active Snake Arcade" width="100%" />
         <br />
-        <strong>3. Snake Arcade</strong>
-      </td>
-      <td align="center" width="25%">
-        <img src="assets/screenshot-youtube.png" alt="Ambient YouTube" width="100%" />
-        <br />
-        <strong>4. Ambient YouTube</strong>
+        <strong>3. Snake Arcade Gaming</strong>
       </td>
     </tr>
   </table>
