@@ -30,6 +30,10 @@ export function useWaitMate() {
     return saved ? JSON.parse(saved) : false; // Par défaut : fermeture automatique
   });
 
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(() => {
+    return localStorage.getItem('waitmate_onboarding_done') !== 'true';
+  });
+
   const keepOpenRef = useRef(keepOpen);
   useEffect(() => {
     keepOpenRef.current = keepOpen;
@@ -100,10 +104,20 @@ export function useWaitMate() {
     recentClicksRef.current = [];
   }, [updateWindowMode]);
 
+  const dismissOnboarding = useCallback(() => {
+    localStorage.setItem('waitmate_onboarding_done', 'true');
+    setShowOnboarding(false);
+    handleStartAi({ prompt: "Welcome! Explore WaitMate while AI works.", model: "WaitMate" });
+  }, [handleStartAi]);
+
   // Écouteurs d'événements Tauri au montage
   useEffect(() => {
-    // Mode compact par défaut
-    updateWindowMode('idle');
+    // Si c'est la première ouverture, afficher en grand avec le message d'accueil
+    if (showOnboarding) {
+      updateWindowMode('active');
+    } else {
+      updateWindowMode('idle');
+    }
 
     let unlistenStart: (() => void) | undefined;
     let unlistenStop: (() => void) | undefined;
@@ -228,6 +242,8 @@ export function useWaitMate() {
     stopPayload,
     keepOpen,
     toggleKeepOpen,
+    showOnboarding,
+    dismissOnboarding,
     registerClick,
     triggerManualStart,
     triggerManualStop,

@@ -92,8 +92,8 @@ export const MiniGame: React.FC<MiniGameProps> = ({
               }`}
               title={
                 keepOpen
-                  ? "Garder ouvert : Activé (ne se fermera pas à la fin de la réponse IA)"
-                  : "Fermeture automatique : Activée (cliquez pour garder ouvert)"
+                  ? "Keep open: Enabled (won't auto-close when AI finishes)"
+                  : "Auto-close: Enabled (click to keep open)"
               }
             >
               <Pin

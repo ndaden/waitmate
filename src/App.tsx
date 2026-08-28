@@ -2,6 +2,7 @@ import { useWaitMate } from './hooks/useWaitMate';
 import { CompanionAvatar } from './components/CompanionAvatar';
 import { MiniGame } from './components/MiniGame';
 import { SuccessBanner } from './components/SuccessBanner';
+import { WelcomeCard } from './components/WelcomeCard';
 import './App.css';
 
 export function App() {
@@ -12,14 +13,23 @@ export function App() {
     stopPayload,
     keepOpen,
     toggleKeepOpen,
+    showOnboarding,
+    dismissOnboarding,
     triggerManualStart,
     dismissActiveMode,
   } = useWaitMate();
 
   return (
     <main className="w-full h-full flex flex-col justify-end items-end p-2 relative overflow-hidden select-none">
-      {/* Panneau de Jeu ou Bannière de Fin */}
-      {mood === 'active' && (
+      {/* Onboarding Welcome Card (only displayed once on first launch) */}
+      {showOnboarding && (
+        <div className="mb-2 w-full transition-all duration-300 ease-out">
+          <WelcomeCard onDismiss={dismissOnboarding} />
+        </div>
+      )}
+
+      {/* Game Panel or Success Banner */}
+      {!showOnboarding && mood === 'active' && (
         <div className="mb-2 w-full transition-all duration-300 ease-out">
           <MiniGame
             stats={stats}
@@ -31,7 +41,7 @@ export function App() {
         </div>
       )}
 
-      {mood === 'success' && (
+      {!showOnboarding && mood === 'success' && (
         <div className="mb-2 w-full transition-all duration-300 ease-out">
           <SuccessBanner
             stats={stats}
@@ -41,12 +51,14 @@ export function App() {
         </div>
       )}
 
-      {/* Avatar Flottant du Compagnon */}
+      {/* Companion Floating Avatar */}
       <div className="flex items-center justify-end w-full">
         <CompanionAvatar
-          mood={mood}
+          mood={showOnboarding ? 'active' : mood}
           onClick={() => {
-            if (mood === 'idle') {
+            if (showOnboarding) {
+              dismissOnboarding();
+            } else if (mood === 'idle') {
               triggerManualStart();
             }
           }}
