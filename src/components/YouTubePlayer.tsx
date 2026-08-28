@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { Search, Video, Play, RotateCcw, X, Flame, Music, Sparkles, Loader2, Volume2, VolumeX } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Search, Video, Play, RotateCcw, X, Flame, Music, Sparkles, Loader2, Volume2, VolumeX, AlertCircle } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 
 interface YouTubePlayerProps {
@@ -23,6 +23,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
   });
   const [videoId, setVideoId] = useState<string>('jfKfPfyJRdk');
   const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -35,9 +36,10 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
     }
   });
 
-  const fetchRandomVideo = async (searchQuery: string) => {
+  const fetchRandomVideo = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) return;
     setIsLoading(true);
+    setHasError(false);
     try {
       const id = await invoke<string>('search_random_youtube_video', {
         query: searchQuery.trim(),
@@ -57,14 +59,36 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [seenIds]);
 
   useEffect(() => {
     if (activeQuery) {
       localStorage.setItem('waitmate_yt_query', activeQuery);
       fetchRandomVideo(activeQuery);
     }
-  }, [activeQuery]);
+  }, [activeQuery, fetchRandomVideo]);
+
+  // Écouter les erreurs renvoyées par l'API YouTube iframe (Codes 100, 101, 150 = restrictions d'intégration)
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (data?.event === 'onError' || (data?.event === 'infoDelivery' && data?.info?.errorCode)) {
+          console.warn('[WaitMate YouTube] Erreur détectée dans le lecteur, passage à la vidéo suivante...', data);
+          setHasError(true);
+          // Réessayer automatiquement avec une autre vidéo
+          setTimeout(() => {
+            fetchRandomVideo(activeQuery);
+          }, 800);
+        }
+      } catch {
+        // Ignorer les messages non JSON
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [activeQuery, fetchRandomVideo]);
 
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -105,6 +129,13 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
       console.warn('postMessage mute error:', e);
     }
   };
+
+  // URL standard YouTube avec support d'origine propre
+  const originParam = typeof window !== 'undefined' && window.location.origin.startsWith('http')
+    ? encodeURIComponent(window.location.origin)
+    : 'https%3A%2F%2Fwww.youtube.com';
+
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&enablejsapi=1&playsinline=1&rel=0&origin=${originParam}`;
 
   return (
     <div className="flex flex-col items-center w-full select-none animate-in fade-in duration-150">
@@ -174,16 +205,16 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
         })}
       </div>
 
-      {/* YouTube Iframe Player (Muted by default) */}
+      {/* YouTube Iframe Player */}
       <div className="w-full aspect-video rounded-xl overflow-hidden bg-black border border-slate-800 relative flex items-center justify-center">
         {videoId ? (
           <iframe
             ref={iframeRef}
             key={videoId}
-            src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&enablejsapi=1&controls=0&disablekb=1&modestbranding=1&fs=0&iv_load_policy=3&rel=0&playsinline=1`}
+            src={embedUrl}
             title="YouTube Player"
-            className="w-full h-full border-0 pointer-events-none"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            className="w-full h-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           />
         ) : (
           <div className="flex flex-col items-center justify-center text-slate-500 space-y-1">
@@ -195,6 +226,19 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
         {isLoading && (
           <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center">
             <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
+          </div>
+        )}
+
+        {hasError && !isLoading && (
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-xs flex flex-col items-center justify-center text-slate-400 p-2 text-center space-y-1.5">
+            <AlertCircle className="w-5 h-5 text-amber-400" />
+            <span className="text-[11px] text-slate-300">Video restricted on embed</span>
+            <button
+              onClick={handleNextVideo}
+              className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-medium transition-colors cursor-pointer"
+            >
+              Play another video
+            </button>
           </div>
         )}
 
@@ -237,3 +281,4 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
     </div>
   );
 };
+

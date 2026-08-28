@@ -186,11 +186,11 @@ async fn search_random_youtube_video(query: String, excluded_ids: Option<Vec<Str
     if ids.is_empty() {
         let query_lower = clean_query.to_lowercase();
         let fallback_list = if query_lower.contains("cat") || query_lower.contains("chat") {
-            vec!["7cTTzvLpoyM", "mcGa4SDTeyc", "rGNlsFrEReo", "tKZb8vg-Qfg", "XPUw4uC772A", "mX2q-r2Hh98", "4IP_E7efGWE", "ByH9LuRMDnA"]
+            vec!["7cTTzvLpoyM", "mcGa4SDTeyc", "rGNlsFrEReo", "tKZb8vg-Qfg", "XPUw4uC772A", "4IP_E7efGWE"]
         } else if query_lower.contains("synth") {
-            vec!["4xDzrJKXOOY", "MVPTGNGiIUU", "rDBbaGCCIhk", "UedTcufyrHc", "21X5lGlDOfg", "ERf23d0vP08"]
+            vec!["4xDzrJKXOOY", "rDBbaGCCIhk", "UedTcufyrHc", "21X5lGlDOfg"]
         } else if query_lower.contains("game") || query_lower.contains("gaming") {
-            vec!["MvA5t23zH28", "8X2kIfS6fb8", "21X5lGlDOfg", "q76bMs-NwRk", "k2qgadSvNyU"]
+            vec!["8X2kIfS6fb8", "21X5lGlDOfg", "q76bMs-NwRk", "k2qgadSvNyU"]
         } else {
             vec!["jfKfPfyJRdk", "5yx6BWlEVcY", "lTRiuFIWV54", "TURbeWK2wwg", "7NOSDKb0HlU", "rUxyKA_-grg", "5qap5aO4i9A"]
         };
