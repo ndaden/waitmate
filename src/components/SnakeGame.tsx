@@ -7,19 +7,19 @@ interface Position {
 }
 
 const GRID_COLS = 20;
-const GRID_ROWS = 17;
-const CELL_SIZE = 16; // pixels -> 320 x 272 px
+const GRID_ROWS = 14;
+const CELL_SIZE = 14; // pixels -> 280 x 196 px
 const INITIAL_SNAKE: Position[] = [
-  { x: 8, y: 8 },
-  { x: 7, y: 8 },
-  { x: 6, y: 8 },
+  { x: 6, y: 7 },
+  { x: 5, y: 7 },
+  { x: 4, y: 7 },
 ];
 const INITIAL_DIRECTION = 'RIGHT';
 const BASE_SPEED_MS = 135;
 
 export const SnakeGame: React.FC = () => {
   const [snake, setSnake] = useState<Position[]>(INITIAL_SNAKE);
-  const [food, setFood] = useState<Position & { isBonus?: boolean }>({ x: 14, y: 8, isBonus: false });
+  const [food, setFood] = useState<Position & { isBonus?: boolean }>({ x: 14, y: 7, isBonus: false });
   const [isGameOver, setIsGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState<number>(() => {
@@ -236,7 +236,7 @@ export const SnakeGame: React.FC = () => {
           ref={canvasRef}
           width={GRID_COLS * CELL_SIZE}
           height={GRID_ROWS * CELL_SIZE}
-          className="block w-full h-auto"
+          className="block"
         />
 
         {isGameOver && (

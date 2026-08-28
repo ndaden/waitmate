@@ -43,7 +43,7 @@ export const MiniGame: React.FC<MiniGameProps> = ({
   };
 
   return (
-    <div className="w-full max-w-[344px] glass-panel rounded-2xl p-3 border border-slate-800 text-white select-none">
+    <div className="w-80 glass-panel rounded-2xl p-3 border border-slate-800 text-white select-none">
       {/* Header */}
       <div
         onMouseDown={handleHeaderMouseDown}
