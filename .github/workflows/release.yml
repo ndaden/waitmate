@@ -16,8 +16,6 @@ jobs:
         include:
           - platform: 'macos-latest'
             args: '--target aarch64-apple-darwin'
-          - platform: 'macos-13'
-            args: '--target x86_64-apple-darwin'
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -33,7 +31,7 @@ jobs:
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin' || 'x86_64-apple-darwin' }}
+          targets: 'aarch64-apple-darwin'
 
       - name: Install dependencies
         run: npm ci
@@ -46,25 +44,20 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: 'WaitMate ${{ github.ref_name }}'
           releaseBody: |
-            ## 🤖 WaitMate ${{ github.ref_name }}
+            ## WaitMate ${{ github.ref_name }}
 
-            Your lightweight, non-intrusive AI waiting companion for macOS.
+            Lightweight, non-intrusive AI waiting companion for macOS.
 
-            ### ✨ Key Features
-            - 🧘 **Discreet Idle Companion**: 160×160 draggable floating avatar in the corner of your screen.
-            - 🟢 **Automatic State Awareness**: Expands when your AI is thinking and snaps back when it is done.
-            - 🎮 **Mini Games & Entertainment**:
-              - 🐍 **Snake Arcade**: Responsive, fast, score tracking.
-              - 📺 **Ambient YouTube**: Keyword-based random video player (muted by default).
-            - 🍏 **macOS Menu Bar Accessory**: Stays in the top menu bar without cluttering your Dock.
-            - 🔔 **Universal Auto-Detection**: Instant support for CLI tools (Claude, Ollama, Aider) and Antigravity IDE.
+            ### Key Features
+            - Discreet floating companion (160x160) that expands during AI processing and retracts on completion.
+            - macOS Menu Bar accessory without Dock clutter.
+            - Built-in micro-activities:
+              - Snake Arcade with high score tracking.
+              - Ambient YouTube player (muted by default) with video search and preset channels.
+            - Universal auto-detection for terminal CLI tools (Claude Code, Ollama, Aider) and Antigravity IDE.
 
-            ### 📦 Installation
-            Download the appropriate `.dmg` file below for your Mac:
-            - **Apple Silicon (M1/M2/M3/M4)**: `WaitMate_..._aarch64.dmg`
-            - **Intel Macs**: `WaitMate_..._x64.dmg`
-
-            Open the `.dmg` and drag **WaitMate** into your **Applications** folder.
+            ### Installation
+            Download the `.dmg` file below, open it, and drag **WaitMate** into your **Applications** folder.
           releaseDraft: false
           prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
           args: ${{ matrix.args }}

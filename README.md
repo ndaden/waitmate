@@ -12,31 +12,25 @@
   <img src="https://img.shields.io/badge/License-MIT-emerald?style=flat-square" alt="License" />
 </p>
 
+## Screenshots
+
 <div align="center">
-  <img src="assets/hero-realistic-screen.png" alt="WaitMate in Realistic Desktop Context" width="100%" />
+  <img src="assets/hero-realistic-screen.png" alt="WaitMate Overview" width="100%" />
 </div>
 
----
-
-## 📸 Real Desktop Showcase
+<br />
 
 <div align="center">
   <table>
     <tr>
       <td align="center" width="33%">
-        <img src="assets/screenshot-desktop-idle.png" alt="Idle Desktop State" width="100%" />
-        <br />
-        <strong>1. Discreet Idle Companion</strong>
+        <img src="assets/screenshot-desktop-idle.png" alt="WaitMate Idle" width="100%" />
       </td>
       <td align="center" width="33%">
-        <img src="assets/screenshot-desktop-youtube.png" alt="Active Ambient YouTube" width="100%" />
-        <br />
-        <strong>2. Ambient Lo-Fi & Video</strong>
+        <img src="assets/screenshot-desktop-youtube.png" alt="WaitMate YouTube" width="100%" />
       </td>
       <td align="center" width="33%">
-        <img src="assets/screenshot-desktop-snake.png" alt="Active Snake Arcade" width="100%" />
-        <br />
-        <strong>3. Snake Arcade Gaming</strong>
+        <img src="assets/screenshot-desktop-snake.png" alt="WaitMate Snake" width="100%" />
       </td>
     </tr>
   </table>
