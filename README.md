@@ -58,21 +58,16 @@ Context-switching to a browser tab or social media destroys flow state. **WaitMa
 - **Zsh Shell Hook**: `preexec`/`precmd` hook integration for zero-effort shell triggering.
 - **HTTP Webhook API**: Local REST endpoint on port `9999` (`POST /start` & `POST /stop`).
 
-### Snake Arcade
-- Responsive 2D retro canvas game with fluid controls (Arrow keys, `WASD`, `ZQSD`, or on-screen D-Pad).
-- Golden bonus apples (+30 pts), score multipliers, and persistent high-score tracking.
+### Activity Hub & Mini-Apps
+- **Real-Time News Reader**: Browse live headlines categorized into *Top*, *World*, *Tech*, and *Business* with source attribution and direct browser reading.
+- **Snake Arcade**: Responsive 2D retro canvas game maximized for desktop with fluid keyboard controls (`Arrows`, `WASD`, `ZQSD`, `Space`).
+- **Ambient YouTube Player**: Type keywords (e.g. `lofi`, `cats`, `gaming`) to launch clean, muted, distraction-free ambient clips without intrusive YouTube overlays.
 
-### Ambient YouTube Player
-- Type any keyword (e.g. `lofi`, `cats`, `synthwave`, `gaming`) to launch a randomized ambient video.
-- **Anti-Repetition Engine**: Automatically excludes recently viewed videos and diversifies search terms to ensure a fresh video every time.
-- **Muted by Default**: Videos start silently to avoid interrupting your audio; toggle sound anytime with one click.
-- **Distraction-Free**: Interactive overlays and player controls are disabled for a clean experience.
-
-### Native macOS Experience
-- Transparent, frameless window with **Always-on-Top** support.
-- Fully draggable anywhere across displays.
-- Automatic window focus upon expansion so keyboard controls work immediately.
-- Menu Bar accessory without Dock clutter.
+### Window & Display Controls
+- **Keep Open (Pinned Mode)**: Toggle between auto-closing on AI completion or keeping the window open to finish reading news, listening to audio, or playing.
+- **Robust Multi-Monitor Support**: Strict per-monitor boundary clamping prevents window clipping across dual-screen or multi-display setups.
+- **First-Launch Onboarding**: Clean, friendly introduction card displayed on initial startup.
+- **Native macOS Experience**: Transparent, frameless window with **Always-on-Top**, menu bar integration, and zero Dock clutter.
 
 ---
 
