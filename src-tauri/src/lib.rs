@@ -277,7 +277,7 @@ pub fn run() {
 
             #[cfg(target_os = "macos")]
             {
-                tray_builder = tray_builder.icon_as_template(true);
+                tray_builder = tray_builder.icon_as_template(false);
             }
 
             let _tray = tray_builder
