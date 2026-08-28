@@ -1,25 +1,25 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Trophy, RefreshCw, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trophy, RefreshCw } from 'lucide-react';
 
 interface Position {
   x: number;
   y: number;
 }
 
-const GRID_COLS = 16;
-const GRID_ROWS = 12;
-const CELL_SIZE = 14; // pixels
+const GRID_COLS = 20;
+const GRID_ROWS = 17;
+const CELL_SIZE = 16; // pixels -> 320 x 272 px
 const INITIAL_SNAKE: Position[] = [
-  { x: 5, y: 6 },
-  { x: 4, y: 6 },
-  { x: 3, y: 6 },
+  { x: 8, y: 8 },
+  { x: 7, y: 8 },
+  { x: 6, y: 8 },
 ];
 const INITIAL_DIRECTION = 'RIGHT';
-const BASE_SPEED_MS = 140;
+const BASE_SPEED_MS = 135;
 
 export const SnakeGame: React.FC = () => {
   const [snake, setSnake] = useState<Position[]>(INITIAL_SNAKE);
-  const [food, setFood] = useState<Position & { isBonus?: boolean }>({ x: 10, y: 6, isBonus: false });
+  const [food, setFood] = useState<Position & { isBonus?: boolean }>({ x: 14, y: 8, isBonus: false });
   const [isGameOver, setIsGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState<number>(() => {
@@ -93,7 +93,7 @@ export const SnakeGame: React.FC = () => {
     if (isGameOver) return;
 
     // Calcul de la vitesse dynamique (accélère légèrement avec le score)
-    const currentSpeed = Math.max(70, BASE_SPEED_MS - Math.floor(score / 30) * 8);
+    const currentSpeed = Math.max(65, BASE_SPEED_MS - Math.floor(score / 30) * 8);
 
     const gameInterval = setInterval(() => {
       setSnake((prevSnake) => {
@@ -160,7 +160,7 @@ export const SnakeGame: React.FC = () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Grille discrète
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
     ctx.lineWidth = 0.5;
     for (let x = 0; x <= GRID_COLS; x++) {
       ctx.beginPath();
@@ -209,88 +209,57 @@ export const SnakeGame: React.FC = () => {
         segment.y * CELL_SIZE + 1,
         CELL_SIZE - 2,
         CELL_SIZE - 2,
-        idx === 0 ? 3 : 2
+        idx === 0 ? 4 : 3
       );
       ctx.fill();
     });
   }, [snake, food]);
 
   return (
-    <div className="flex flex-col items-center select-none">
-      {/* Barre de score rapide */}
-      <div className="w-full flex items-center justify-between px-2 py-1 mb-2 rounded-lg bg-slate-900 border border-slate-800 text-xs">
-        <div className="flex items-center space-x-1">
+    <div className="flex flex-col items-center w-full select-none">
+      {/* Barre de score */}
+      <div className="w-full flex items-center justify-between px-2.5 py-1 mb-2 rounded-lg bg-slate-900 border border-slate-800 text-xs">
+        <div className="flex items-center space-x-1.5">
           <span className="text-[10px] text-slate-400">Score:</span>
           <span className="font-mono font-bold text-slate-200">{score}</span>
         </div>
 
-        <div className="flex items-center space-x-1 text-slate-400">
+        <div className="flex items-center space-x-1.5 text-slate-400">
           <Trophy className="w-3 h-3 text-amber-400" />
           <span className="font-mono font-bold text-slate-200">{highScore}</span>
         </div>
       </div>
 
-      {/* Zone Canvas & Overlay Game Over */}
-      <div className="relative rounded-xl overflow-hidden border border-slate-800 bg-slate-950 flex items-center justify-center">
+      {/* Zone Canvas Maximisée & Overlay Game Over */}
+      <div className="w-full relative rounded-xl overflow-hidden border border-slate-800 bg-slate-950 flex items-center justify-center shadow-inner">
         <canvas
           ref={canvasRef}
           width={GRID_COLS * CELL_SIZE}
           height={GRID_ROWS * CELL_SIZE}
-          className="block"
+          className="block w-full h-auto"
         />
 
         {isGameOver && (
-          <div className="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center p-2 text-center animate-in fade-in">
-            <span className="text-xs font-bold text-rose-400 mb-0.5 uppercase tracking-wider">
+          <div className="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center p-3 text-center animate-in fade-in">
+            <span className="text-sm font-bold text-rose-400 mb-1 uppercase tracking-wider">
               Game Over
             </span>
-            <span className="text-xs text-slate-400 mb-2">{score} pts</span>
+            <span className="text-xs text-slate-300 mb-3">{score} points</span>
             <button
               onClick={resetGame}
-              className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs cursor-pointer transition-all active:scale-95"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs cursor-pointer transition-all active:scale-95 shadow-md"
             >
-              <RefreshCw className="w-3 h-3" />
-              <span>Play Again</span>
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Play Again (Space)</span>
             </button>
           </div>
         )}
       </div>
 
-      {/* Touch / Mouse controls */}
-      <div className="mt-2 flex items-center justify-between w-full px-1">
-        <span className="text-[10px] text-slate-500 font-mono">Arrows / WASD</span>
-
-        <div className="grid grid-cols-3 gap-1 w-20">
-          <div />
-          <button
-            onClick={() => changeDirection('UP')}
-            className="p-1 rounded bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer active:scale-90 transition-all"
-          >
-            <ChevronUp className="w-3.5 h-3.5" />
-          </button>
-          <div />
-
-          <button
-            onClick={() => changeDirection('LEFT')}
-            className="p-1 rounded bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer active:scale-90 transition-all"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-
-          <button
-            onClick={() => changeDirection('DOWN')}
-            className="p-1 rounded bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer active:scale-90 transition-all"
-          >
-            <ChevronDown className="w-3.5 h-3.5" />
-          </button>
-
-          <button
-            onClick={() => changeDirection('RIGHT')}
-            className="p-1 rounded bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer active:scale-90 transition-all"
-          >
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
+      {/* Footer Minimaliste */}
+      <div className="mt-2 flex items-center justify-between w-full px-1 text-[10px] text-slate-500 font-mono">
+        <span>Arrows / WASD / ZQSD</span>
+        <span>Space: Restart</span>
       </div>
     </div>
   );
