@@ -32,6 +32,8 @@ jobs:
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin' || 'x86_64-apple-darwin' }}
 
       - name: Install dependencies
         run: npm ci
@@ -43,7 +45,26 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'WaitMate ${{ github.ref_name }}'
-          releaseBody: 'Voir les notes de version pour WaitMate ${{ github.ref_name }}.'
+          releaseBody: |
+            ## 🤖 WaitMate ${{ github.ref_name }}
+
+            Your lightweight, non-intrusive AI waiting companion for macOS.
+
+            ### ✨ Key Features
+            - 🧘 **Discreet Idle Companion**: 160×160 draggable floating avatar in the corner of your screen.
+            - 🟢 **Automatic State Awareness**: Expands when your AI is thinking and snaps back when it is done.
+            - 🎮 **Mini Games & Entertainment**:
+              - 🐍 **Snake Arcade**: Responsive, fast, score tracking.
+              - 📺 **Ambient YouTube**: Keyword-based random video player (muted by default).
+            - 🍏 **macOS Menu Bar Accessory**: Stays in the top menu bar without cluttering your Dock.
+            - 🔔 **Universal Auto-Detection**: Instant support for CLI tools (Claude, Ollama, Aider) and Antigravity IDE.
+
+            ### 📦 Installation
+            Download the appropriate `.dmg` file below for your Mac:
+            - **Apple Silicon (M1/M2/M3/M4)**: `WaitMate_..._aarch64.dmg`
+            - **Intel Macs**: `WaitMate_..._x64.dmg`
+
+            Open the `.dmg` and drag **WaitMate** into your **Applications** folder.
           releaseDraft: false
-          prerelease: false
+          prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
           args: ${{ matrix.args }}
