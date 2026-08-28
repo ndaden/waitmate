@@ -291,11 +291,14 @@ async fn fetch_latest_news(category: Option<String>) -> Result<Vec<NewsArticle>,
         _ => "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en",
     };
 
+    println!("[WaitMate News] Fetching category '{}' from {}", cat, url);
+
     let output = std::process::Command::new("curl")
         .args([
             "-s",
-            "--max-time", "4",
-            "-H", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+            "-L",
+            "--max-time", "5",
+            "-H", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             url,
         ])
         .output()

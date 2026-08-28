@@ -217,7 +217,7 @@ export const MiniGame: React.FC<MiniGameProps> = ({
       {/* VUE 4 : NEWS */}
       {view === 'news' && (
         <div className="animate-in fade-in duration-150">
-          <NewsReader />
+          <NewsReader onBack={() => setView('hub')} />
         </div>
       )}
     </div>

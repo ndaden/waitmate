@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Globe, Cpu, TrendingUp, Sparkles, RotateCcw, ExternalLink, Loader2, AlertCircle, Newspaper } from 'lucide-react';
+import { Globe, Cpu, TrendingUp, Sparkles, RotateCcw, ExternalLink, Loader2, AlertCircle, Newspaper, ArrowLeft } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 
 interface NewsArticle {
@@ -18,7 +18,11 @@ const CATEGORIES: { id: NewsCategory; label: string; icon: React.FC<{ className?
   { id: 'business', label: 'Business', icon: TrendingUp },
 ];
 
-export const NewsReader: React.FC = () => {
+interface NewsReaderProps {
+  onBack?: () => void;
+}
+
+export const NewsReader: React.FC<NewsReaderProps> = ({ onBack }) => {
   const [category, setCategory] = useState<NewsCategory>('top');
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,6 +50,14 @@ export const NewsReader: React.FC = () => {
     loadNews(category);
   }, [category, loadNews]);
 
+  const handleSelectCategory = (cat: NewsCategory) => {
+    if (cat !== category) {
+      setCategory(cat);
+      setArticles([]);
+      loadNews(cat);
+    }
+  };
+
   const handleOpenArticle = async (url: string) => {
     try {
       await invoke('open_external_url', { url });
@@ -57,9 +69,21 @@ export const NewsReader: React.FC = () => {
 
   return (
     <div className="flex flex-col w-full select-none animate-in fade-in duration-150">
-      {/* Category Tabs Bar & Refresh Button */}
+      {/* Category Tabs Bar & Back/Refresh Button */}
       <div className="w-full flex items-center justify-between gap-1 mb-2 pb-1 border-b border-white/5">
         <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar py-0.5">
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex items-center space-x-1 px-2 py-0.5 rounded-lg text-[10px] font-medium border bg-slate-800/80 hover:bg-slate-700 border-slate-700 text-slate-300 hover:text-white transition-all cursor-pointer mr-0.5"
+              title="Back to Hub menu"
+            >
+              <ArrowLeft className="w-2.5 h-2.5" />
+              <span>Hub</span>
+            </button>
+          )}
+
           {CATEGORIES.map((cat) => {
             const isSelected = category === cat.id;
             const Icon = cat.icon;
@@ -67,7 +91,7 @@ export const NewsReader: React.FC = () => {
               <button
                 key={cat.id}
                 type="button"
-                onClick={() => setCategory(cat.id)}
+                onClick={() => handleSelectCategory(cat.id)}
                 className={`flex items-center space-x-1 px-2 py-0.5 rounded-lg text-[10px] font-medium border transition-all cursor-pointer active:scale-95 ${
                   isSelected
                     ? 'bg-slate-800 border-slate-600 text-white shadow-xs'
@@ -83,7 +107,10 @@ export const NewsReader: React.FC = () => {
 
         <button
           type="button"
-          onClick={() => loadNews(category)}
+          onClick={() => {
+            setArticles([]);
+            loadNews(category);
+          }}
           disabled={isLoading}
           className="p-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50 flex-shrink-0"
           title="Refresh headlines"
@@ -97,7 +124,7 @@ export const NewsReader: React.FC = () => {
         {isLoading && articles.length === 0 ? (
           <div className="py-12 flex flex-col items-center justify-center text-slate-400 space-y-2">
             <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
-            <span className="text-xs">Fetching headlines...</span>
+            <span className="text-xs">Fetching {category} headlines...</span>
           </div>
         ) : error && articles.length === 0 ? (
           <div className="py-10 flex flex-col items-center justify-center text-center p-3 space-y-2">
@@ -140,11 +167,21 @@ export const NewsReader: React.FC = () => {
 
       {/* Footer Info */}
       <div className="mt-2 flex items-center justify-between w-full px-1 text-[10px] text-slate-500">
-        <span className="flex items-center space-x-1">
-          <Newspaper className="w-2.5 h-2.5" />
-          <span>Real-time feeds</span>
-        </span>
-        <span>Tap to open article</span>
+        {onBack ? (
+          <button
+            onClick={onBack}
+            className="flex items-center space-x-1 text-slate-400 hover:text-cyan-300 transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-2.5 h-2.5" />
+            <span>Back to Menu</span>
+          </button>
+        ) : (
+          <span className="flex items-center space-x-1">
+            <Newspaper className="w-2.5 h-2.5" />
+            <span>Real-time feeds</span>
+          </span>
+        )}
+        <span>Tap article to open</span>
       </div>
     </div>
   );
