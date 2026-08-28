@@ -277,9 +277,10 @@ pub fn run() {
             if let Some(icon) = app.default_window_icon() {
                 tray_builder = tray_builder.icon(icon.clone());
             }
+
             #[cfg(target_os = "macos")]
             {
-                tray_builder = tray_builder.icon_as_template(false);
+                tray_builder = tray_builder.icon_as_template(true);
             }
 
             let _tray = tray_builder
