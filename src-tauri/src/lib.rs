@@ -256,6 +256,132 @@ async fn search_random_youtube_video(query: String, excluded_ids: Option<Vec<Str
     Ok(chosen_id)
 }
 
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
+pub struct NewsArticle {
+    pub title: String,
+    pub source: String,
+    pub link: String,
+    pub pub_date: String,
+}
+
+#[tauri::command]
+fn open_external_url(url: String) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        let _ = std::process::Command::new("open").arg(&url).spawn();
+    }
+    #[cfg(target_os = "windows")]
+    {
+        let _ = std::process::Command::new("cmd").args(["/C", "start", &url]).spawn();
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let _ = std::process::Command::new("xdg-open").arg(&url).spawn();
+    }
+    Ok(())
+}
+
+#[tauri::command]
+async fn fetch_latest_news(category: Option<String>) -> Result<Vec<NewsArticle>, String> {
+    let cat = category.unwrap_or_else(|| "top".to_string()).to_lowercase();
+    let url = match cat.as_str() {
+        "world" => "https://news.google.com/rss/headlines/section/topic/WORLD?hl=en-US&gl=US&ceid=US:en",
+        "tech" => "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-US&gl=US&ceid=US:en",
+        "business" => "https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=en-US&gl=US&ceid=US:en",
+        _ => "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en",
+    };
+
+    let output = std::process::Command::new("curl")
+        .args([
+            "-s",
+            "--max-time", "4",
+            "-H", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+            url,
+        ])
+        .output()
+        .map_err(|e| format!("Curl error: {}", e))?;
+
+    if !output.status.success() {
+        return Err("Failed to fetch RSS feed".to_string());
+    }
+
+    let xml = String::from_utf8_lossy(&output.stdout).to_string();
+    let mut articles = Vec::new();
+
+    let item_splits: Vec<&str> = xml.split("<item>").collect();
+    for item in item_splits.into_iter().skip(1) {
+        if let Some(end_item) = item.find("</item>") {
+            let item_content = &item[..end_item];
+
+            let mut title = "";
+            if let Some(t_start) = item_content.find("<title>") {
+                if let Some(t_end) = item_content[t_start + 7..].find("</title>") {
+                    title = &item_content[t_start + 7..t_start + 7 + t_end];
+                }
+            }
+
+            let mut link = "";
+            if let Some(l_start) = item_content.find("<link>") {
+                if let Some(l_end) = item_content[l_start + 6..].find("</link>") {
+                    link = &item_content[l_start + 6..l_start + 6 + l_end];
+                }
+            }
+
+            let mut pub_date = "";
+            if let Some(p_start) = item_content.find("<pubDate>") {
+                if let Some(p_end) = item_content[p_start + 9..].find("</pubDate>") {
+                    pub_date = &item_content[p_start + 9..p_start + 9 + p_end];
+                }
+            }
+
+            let mut source = "";
+            if let Some(s_start) = item_content.find("<source") {
+                if let Some(tag_close) = item_content[s_start..].find(">") {
+                    let text_start = s_start + tag_close + 1;
+                    if let Some(s_end) = item_content[text_start..].find("</source>") {
+                        source = &item_content[text_start..text_start + s_end];
+                    }
+                }
+            }
+
+            let mut clean_title = title.trim().to_string();
+            let mut clean_source = source.trim().to_string();
+
+            if clean_source.is_empty() {
+                if let Some(idx) = clean_title.rfind(" - ") {
+                    clean_source = clean_title[idx + 3..].trim().to_string();
+                    clean_title = clean_title[..idx].trim().to_string();
+                } else {
+                    clean_source = "News".to_string();
+                }
+            } else if let Some(idx) = clean_title.rfind(" - ") {
+                clean_title = clean_title[..idx].trim().to_string();
+            }
+
+            let formatted_date = if pub_date.len() >= 22 {
+                pub_date[17..22].to_string()
+            } else {
+                "Recent".to_string()
+            };
+
+            if !clean_title.is_empty() && !link.is_empty() {
+                articles.push(NewsArticle {
+                    title: clean_title,
+                    source: clean_source,
+                    link: link.trim().to_string(),
+                    pub_date: formatted_date,
+                });
+            }
+
+            if articles.len() >= 20 {
+                break;
+            }
+        }
+    }
+
+    Ok(articles)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let watcher_state = WatcherState::new();
@@ -267,13 +393,13 @@ pub fn run() {
         .setup(move |app| {
             let handle = app.handle().clone();
 
-            // 1. Démarrer le serveur HTTP Webhook (Port 9999) en tâche de fond
+            // 1. Démarrer le serveur HTTP de webhook local (127.0.0.1:9999)
             let server_handle = handle.clone();
             tauri::async_runtime::spawn(async move {
                 server::start_server(server_handle).await;
             });
 
-            // 2. Démarrer le Watcher de logs Antigravity (Auto-détection IA)
+            // 2. Démarrer le Watcher universel Antigravity (logs CLI + IDE)
             let watcher_handle = handle.clone();
             let auto_detect_flag_anti = auto_detect_flag.clone();
             tauri::async_runtime::spawn(async move {
@@ -335,7 +461,9 @@ pub fn run() {
             start_dragging,
             set_window_mode,
             toggle_auto_detect,
-            search_random_youtube_video
+            search_random_youtube_video,
+            fetch_latest_news,
+            open_external_url
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

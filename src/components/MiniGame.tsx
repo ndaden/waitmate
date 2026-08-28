@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Clock, GripHorizontal, Gamepad2, X, ChevronRight, ArrowLeft, Video, Pin } from 'lucide-react';
+import { Clock, GripHorizontal, Gamepad2, X, ChevronRight, ArrowLeft, Video, Pin, Newspaper } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { GameStats, StartPayload } from '../types';
 import { SnakeGame } from './SnakeGame';
 import { YouTubePlayer } from './YouTubePlayer';
+import { NewsReader } from './NewsReader';
 
 interface MiniGameProps {
   stats: GameStats;
@@ -13,7 +14,7 @@ interface MiniGameProps {
   onClose: () => void;
 }
 
-type ActiveView = 'hub' | 'snake' | 'youtube';
+type ActiveView = 'hub' | 'snake' | 'youtube' | 'news';
 
 export const MiniGame: React.FC<MiniGameProps> = ({
   stats,
@@ -168,6 +169,27 @@ export const MiniGame: React.FC<MiniGameProps> = ({
             <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-rose-400 transition-colors" />
           </button>
 
+          {/* Option News */}
+          <button
+            onClick={() => setView('news')}
+            className="w-full p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-slate-700 flex items-center justify-between transition-all group cursor-pointer active:scale-98"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 group-hover:scale-105 transition-transform">
+                <Newspaper className="w-4 h-4" />
+              </div>
+              <div className="text-left">
+                <div className="text-xs font-medium text-white group-hover:text-cyan-300 transition-colors">
+                  Latest News
+                </div>
+                <div className="text-[10px] text-slate-500">
+                  World & trending headlines
+                </div>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 transition-colors" />
+          </button>
+
           {/* Close button */}
           <button
             onClick={onClose}
@@ -189,6 +211,13 @@ export const MiniGame: React.FC<MiniGameProps> = ({
       {view === 'youtube' && (
         <div className="animate-in fade-in duration-150">
           <YouTubePlayer />
+        </div>
+      )}
+
+      {/* VUE 4 : NEWS */}
+      {view === 'news' && (
+        <div className="animate-in fade-in duration-150">
+          <NewsReader />
         </div>
       )}
     </div>
