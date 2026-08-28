@@ -262,26 +262,51 @@ pub fn run() {
                 }
             }
 
-            // 4. Créer le menu Tray (barre des menus / zone de notification)
+            // 4. Masquer l'icône du Dock macOS (Mode barre des menus / accessoire flottant)
+            #[cfg(target_os = "macos")]
+            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+
+            // 5. Créer le menu Tray dans la barre des menus macOS (en haut à droite)
+            let toggle_i = MenuItem::with_id(app, "toggle_companion", "✨ Ouvrir / Réduire WaitMate", true, None::<&str>)?;
+            let start_i = MenuItem::with_id(app, "test_start", "⚡ Déclencher mode Actif", true, None::<&str>)?;
+            let stop_i = MenuItem::with_id(app, "test_stop", "🛑 Passer en Veille", true, None::<&str>)?;
             let quit_i = MenuItem::with_id(app, "quit", "❌ Quitter WaitMate", true, None::<&str>)?;
-            let start_i = MenuItem::with_id(app, "test_start", "🚀 Simuler IA en cours (Start)", true, None::<&str>)?;
-            let stop_i = MenuItem::with_id(app, "test_stop", "🛑 Simuler IA terminée (Stop)", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&start_i, &stop_i, &quit_i])?;
+            let menu = Menu::with_items(app, &[&toggle_i, &start_i, &stop_i, &quit_i])?;
 
             let app_handle_for_tray = app.handle().clone();
-            let _tray = TrayIconBuilder::new()
+            let mut tray_builder = TrayIconBuilder::new()
                 .menu(&menu)
                 .show_menu_on_left_click(true)
-                .tooltip("WaitMate - Compagnon d'attente IA")
+                .tooltip("WaitMate - Compagnon d'attente IA");
+
+            if let Some(icon) = app.default_window_icon() {
+                tray_builder = tray_builder.icon(icon.clone());
+            }
+            #[cfg(target_os = "macos")]
+            {
+                tray_builder = tray_builder.icon_as_template(false);
+            }
+
+            let _tray = tray_builder
                 .on_menu_event(move |_app, event| match event.id.as_ref() {
                     "quit" => {
                         std::process::exit(0);
+                    }
+                    "toggle_companion" => {
+                        let _ = app_handle_for_tray.emit(
+                            "start-ai",
+                            &StartPayload {
+                                prompt: Some("Ouverture manuelle".to_string()),
+                                model: Some("WaitMate".to_string()),
+                                estimated_time: Some(30),
+                            },
+                        );
                     }
                     "test_start" => {
                         let _ = app_handle_for_tray.emit(
                             "start-ai",
                             &StartPayload {
-                                prompt: Some("Test depuis le menu Tray".to_string()),
+                                prompt: Some("Test depuis la barre des menus".to_string()),
                                 model: Some("Test Mode".to_string()),
                                 estimated_time: Some(30),
                             },
@@ -292,7 +317,7 @@ pub fn run() {
                             "stop-ai",
                             &StopPayload {
                                 success: Some(true),
-                                summary: Some("Fin de génération depuis le menu Tray".to_string()),
+                                summary: Some("Fin de génération".to_string()),
                                 auto_timeout: Some(false),
                             },
                         );
