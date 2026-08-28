@@ -1,8 +1,8 @@
-<h1 align="center">WaitMate</h1>
-
-<p align="center">
-  <strong>The floating desktop companion that turns AI waiting times into focused micro-breaks.</strong>
-</p>
+<div align="center">
+  <img src="assets/icon.png" width="72" height="72" alt="WaitMate Icon" />
+  <h1>WaitMate</h1>
+  <p><strong>The floating desktop companion that turns AI waiting times into focused micro-breaks.</strong></p>
+</div>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Tauri-v2.0-blue?logo=tauri&style=flat-square" alt="Tauri v2" />
