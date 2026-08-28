@@ -272,11 +272,8 @@ pub fn run() {
             let mut tray_builder = TrayIconBuilder::new()
                 .menu(&menu)
                 .show_menu_on_left_click(true)
-                .tooltip("WaitMate - AI Waiting Companion");
-
-            if let Some(icon) = app.default_window_icon() {
-                tray_builder = tray_builder.icon(icon.clone());
-            }
+                .tooltip("WaitMate - AI Waiting Companion")
+                .icon(tauri::include_image!("icons/tray-icon.png"));
 
             #[cfg(target_os = "macos")]
             {
