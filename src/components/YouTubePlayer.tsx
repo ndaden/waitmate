@@ -145,7 +145,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
     }
   };
 
-  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&enablejsapi=1&playsinline=1&rel=0`;
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&controls=0&disablekb=1&fs=0&iv_load_policy=3&playsinline=1&rel=0&enablejsapi=1`;
 
   return (
     <div className="flex flex-col items-center w-full select-none animate-in fade-in duration-150">
@@ -223,7 +223,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
             key={videoId}
             src={embedUrl}
             title="YouTube Player"
-            className="w-full h-full border-0"
+            className="w-full h-full border-0 pointer-events-none"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             onLoad={() => setIsLoading(false)}
           />
