@@ -47,7 +47,7 @@ export const CompanionAvatar: React.FC<CompanionAvatarProps> = ({
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         className="relative flex items-center justify-center cursor-grab active:cursor-grabbing p-1"
-        title="Glisser pour déplacer • Cliquer pour ouvrir"
+        title="Drag to move • Click to open"
       >
         {/* Corps du compagnon (sans halo, sans bounce) */}
         <div

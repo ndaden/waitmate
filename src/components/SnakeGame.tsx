@@ -242,7 +242,7 @@ export const SnakeGame: React.FC = () => {
         {isGameOver && (
           <div className="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center p-2 text-center animate-in fade-in">
             <span className="text-xs font-bold text-rose-400 mb-0.5 uppercase tracking-wider">
-              Fin de partie
+              Game Over
             </span>
             <span className="text-xs text-slate-400 mb-2">{score} pts</span>
             <button
@@ -250,15 +250,15 @@ export const SnakeGame: React.FC = () => {
               className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs cursor-pointer transition-all active:scale-95"
             >
               <RefreshCw className="w-3 h-3" />
-              <span>Rejouer</span>
+              <span>Play Again</span>
             </button>
           </div>
         )}
       </div>
 
-      {/* Contrôles tactiles / souris */}
+      {/* Touch / Mouse controls */}
       <div className="mt-2 flex items-center justify-between w-full px-1">
-        <span className="text-[10px] text-slate-500 font-mono">Flèches / ZQSD</span>
+        <span className="text-[10px] text-slate-500 font-mono">Arrows / WASD</span>
 
         <div className="grid grid-cols-3 gap-1 w-20">
           <div />

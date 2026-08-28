@@ -61,7 +61,7 @@ export function useWaitMate() {
   // Déclencher le début d'une session IA
   const handleStartAi = useCallback((payload?: StartPayload) => {
     if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
-    setStartPayload(payload || { prompt: "Génération en cours...", model: "IA" });
+    setStartPayload(payload || { prompt: "Generating response...", model: "AI" });
     setStopPayload(null);
     setMood('active');
     updateWindowMode('active');

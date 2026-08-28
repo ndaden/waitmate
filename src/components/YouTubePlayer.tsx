@@ -116,7 +116,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Mot-clé vidéo (ex: lofi, chat, gaming)..."
+            placeholder="Search keyword (e.g. lofi, cats, gaming)..."
             className="w-full py-1.5 pl-8 pr-14 rounded-xl bg-slate-900 border border-slate-700/80 focus:border-slate-500 text-xs text-white placeholder:text-slate-500 focus:outline-none transition-all"
           />
           <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" />
@@ -151,7 +151,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
         </div>
       </form>
 
-      {/* Raccourcis / Tags rapides */}
+      {/* Preset Topics */}
       <div className="w-full flex items-center space-x-1.5 mb-2 overflow-x-auto no-scrollbar py-0.5">
         {PRESET_TOPICS.map((preset) => {
           const isSelected = activeQuery === preset.query;
@@ -174,7 +174,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
         })}
       </div>
 
-      {/* Lecteur Iframe YouTube (Muet par défaut) */}
+      {/* YouTube Iframe Player (Muted by default) */}
       <div className="w-full aspect-video rounded-xl overflow-hidden bg-black border border-slate-800 relative flex items-center justify-center">
         {videoId ? (
           <iframe
@@ -188,7 +188,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
         ) : (
           <div className="flex flex-col items-center justify-center text-slate-500 space-y-1">
             <Video className="w-8 h-8 text-slate-600" />
-            <span className="text-xs">Tape un mot-clé</span>
+            <span className="text-xs">Type a keyword</span>
           </div>
         )}
 
@@ -198,27 +198,27 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
           </div>
         )}
 
-        {/* Bouton Muet / Activer le son discret en bas à droite du lecteur */}
+        {/* Mute / Unmute Button */}
         <button
           onClick={toggleSound}
           className="absolute bottom-2 right-2 p-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition-all cursor-pointer shadow-md active:scale-90 flex items-center space-x-1 text-[10px]"
-          title={isMuted ? "Activer le son" : "Couper le son"}
+          title={isMuted ? "Unmute sound" : "Mute sound"}
         >
           {isMuted ? (
             <>
               <VolumeX className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-[9px] text-slate-400">Muet</span>
+              <span className="text-[9px] text-slate-400">Muted</span>
             </>
           ) : (
             <>
               <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-[9px] text-emerald-300">Son actif</span>
+              <span className="text-[9px] text-emerald-300">Sound on</span>
             </>
           )}
         </button>
       </div>
 
-      {/* Contrôle rapide sous le lecteur */}
+      {/* Controls below player */}
       <div className="w-full mt-2 flex items-center justify-between px-1 text-[10px] text-slate-500">
         <span className="truncate max-w-[190px] text-slate-400 font-mono">
           {activeQuery}
@@ -228,10 +228,10 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
           onClick={handleNextVideo}
           disabled={isLoading}
           className="flex items-center space-x-1 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer disabled:opacity-50"
-          title="Tirer une autre vidéo au sort"
+          title="Pick another random video"
         >
           <RotateCcw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
-          <span>Suivant</span>
+          <span>Random video</span>
         </button>
       </div>
     </div>

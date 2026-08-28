@@ -57,7 +57,7 @@ export const MiniGame: React.FC<MiniGameProps> = ({
                 setView('hub');
               }}
               className="p-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition-all cursor-pointer"
-              title="Menu"
+              title="Back"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
             </button>
@@ -67,7 +67,7 @@ export const MiniGame: React.FC<MiniGameProps> = ({
 
           <div className="flex items-center space-x-1.5">
             <span className="text-xs font-semibold text-slate-200">
-              {startPayload?.model || "IA"}
+              {startPayload?.model || "AI"}
             </span>
             <GripHorizontal className="w-3 h-3 text-slate-600" />
           </div>
@@ -85,14 +85,14 @@ export const MiniGame: React.FC<MiniGameProps> = ({
               onClose();
             }}
             className="p-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer active:scale-95"
-            title="Fermer"
+            title="Close"
           >
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      {/* VUE 1 : MENU ACTIVITÉS */}
+      {/* VUE 1 : ACTIVITY HUB */}
       {view === 'hub' && (
         <div className="animate-in fade-in duration-150 space-y-1.5 py-0.5">
           {/* Option Snake */}
@@ -109,7 +109,7 @@ export const MiniGame: React.FC<MiniGameProps> = ({
                   Snake
                 </div>
                 <div className="text-[10px] text-slate-500 font-mono">
-                  Record : {snakeHighScore}
+                  Best: {snakeHighScore}
                 </div>
               </div>
             </div>
@@ -130,19 +130,19 @@ export const MiniGame: React.FC<MiniGameProps> = ({
                   YouTube
                 </div>
                 <div className="text-[10px] text-slate-500">
-                  Clips & vidéos par mot-clé
+                  Random clips by keyword
                 </div>
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-rose-400 transition-colors" />
           </button>
 
-          {/* Bouton Fermer */}
+          {/* Close button */}
           <button
             onClick={onClose}
             className="w-full mt-1 py-1.5 rounded-lg text-xs text-slate-400 hover:text-slate-200 transition-colors cursor-pointer text-center"
           >
-            Fermer
+            Close
           </button>
         </div>
       )}

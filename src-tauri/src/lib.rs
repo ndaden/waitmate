@@ -2,12 +2,11 @@ mod server;
 mod watcher;
 
 use std::sync::atomic::Ordering;
-use server::{StartPayload, StopPayload};
 use watcher::WatcherState;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
-    Emitter, LogicalPosition, LogicalSize, Manager, State, WebviewWindow,
+    LogicalPosition, LogicalSize, Manager, State, WebviewWindow,
 };
 
 #[tauri::command]
@@ -262,22 +261,18 @@ pub fn run() {
                 }
             }
 
-            // 4. Masquer l'icône du Dock macOS (Mode barre des menus / accessoire flottant)
+            // 4. Hide from macOS Dock (Accessory Menu Bar companion)
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
-            // 5. Créer le menu Tray dans la barre des menus macOS (en haut à droite)
-            let toggle_i = MenuItem::with_id(app, "toggle_companion", "✨ Ouvrir / Réduire WaitMate", true, None::<&str>)?;
-            let start_i = MenuItem::with_id(app, "test_start", "⚡ Déclencher mode Actif", true, None::<&str>)?;
-            let stop_i = MenuItem::with_id(app, "test_stop", "🛑 Passer en Veille", true, None::<&str>)?;
-            let quit_i = MenuItem::with_id(app, "quit", "❌ Quitter WaitMate", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&toggle_i, &start_i, &stop_i, &quit_i])?;
+            // 5. Create clean Tray menu with only Quit WaitMate
+            let quit_i = MenuItem::with_id(app, "quit", "Quit WaitMate", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&quit_i])?;
 
-            let app_handle_for_tray = app.handle().clone();
             let mut tray_builder = TrayIconBuilder::new()
                 .menu(&menu)
                 .show_menu_on_left_click(true)
-                .tooltip("WaitMate - Compagnon d'attente IA");
+                .tooltip("WaitMate - AI Waiting Companion");
 
             if let Some(icon) = app.default_window_icon() {
                 tray_builder = tray_builder.icon(icon.clone());
@@ -291,36 +286,6 @@ pub fn run() {
                 .on_menu_event(move |_app, event| match event.id.as_ref() {
                     "quit" => {
                         std::process::exit(0);
-                    }
-                    "toggle_companion" => {
-                        let _ = app_handle_for_tray.emit(
-                            "start-ai",
-                            &StartPayload {
-                                prompt: Some("Ouverture manuelle".to_string()),
-                                model: Some("WaitMate".to_string()),
-                                estimated_time: Some(30),
-                            },
-                        );
-                    }
-                    "test_start" => {
-                        let _ = app_handle_for_tray.emit(
-                            "start-ai",
-                            &StartPayload {
-                                prompt: Some("Test depuis la barre des menus".to_string()),
-                                model: Some("Test Mode".to_string()),
-                                estimated_time: Some(30),
-                            },
-                        );
-                    }
-                    "test_stop" => {
-                        let _ = app_handle_for_tray.emit(
-                            "stop-ai",
-                            &StopPayload {
-                                success: Some(true),
-                                summary: Some("Fin de génération".to_string()),
-                                auto_timeout: Some(false),
-                            },
-                        );
                     }
                     _ => {}
                 })

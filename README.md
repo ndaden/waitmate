@@ -22,12 +22,12 @@
       <td align="center" width="25%">
         <img src="assets/screenshot-idle.png" alt="Idle State" width="100%" />
         <br />
-        <strong>1. En veille (160×160)</strong>
+        <strong>1. Idle State (160×160)</strong>
       </td>
       <td align="center" width="25%">
-        <img src="assets/screenshot-menu.png" alt="Activity Menu" width="100%" />
+        <img src="assets/screenshot-menu.png" alt="Activity Hub" width="100%" />
         <br />
-        <strong>2. Hub d'activités</strong>
+        <strong>2. Activity Hub</strong>
       </td>
       <td align="center" width="25%">
         <img src="assets/screenshot-snake.png" alt="Snake Arcade" width="100%" />
@@ -35,9 +35,9 @@
         <strong>3. Snake Arcade</strong>
       </td>
       <td align="center" width="25%">
-        <img src="assets/screenshot-youtube.png" alt="YouTube Player" width="100%" />
+        <img src="assets/screenshot-youtube.png" alt="Ambient YouTube" width="100%" />
         <br />
-        <strong>4. YouTube Aléatoire</strong>
+        <strong>4. Ambient YouTube</strong>
       </td>
     </tr>
   </table>
