@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="assets/hero-banner.jpg" alt="WaitMate Hero Banner" width="100%" style="border-radius: 12px;" />
-</p>
-
 <h1 align="center">🤖 WaitMate</h1>
 
 <p align="center">
@@ -18,6 +14,37 @@
 
 ---
 
+## 📸 Real App Screenshots
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="25%">
+        <img src="assets/screenshot-idle.png" alt="Idle State" width="100%" />
+        <br />
+        <strong>1. En veille (160×160)</strong>
+      </td>
+      <td align="center" width="25%">
+        <img src="assets/screenshot-menu.png" alt="Activity Menu" width="100%" />
+        <br />
+        <strong>2. Hub d'activités</strong>
+      </td>
+      <td align="center" width="25%">
+        <img src="assets/screenshot-snake.png" alt="Snake Arcade" width="100%" />
+        <br />
+        <strong>3. Snake Arcade</strong>
+      </td>
+      <td align="center" width="25%">
+        <img src="assets/screenshot-youtube.png" alt="YouTube Player" width="100%" />
+        <br />
+        <strong>4. YouTube Aléatoire</strong>
+      </td>
+    </tr>
+  </table>
+</div>
+
+---
+
 ## 💡 Why WaitMate?
 
 When working with modern LLMs and agentic coding tools (**Antigravity**, **Claude Code**, **Ollama**, **Aider**), developers spend dozens of 15–60 second intervals waiting for answers, tool executions, and file diffs. 
@@ -30,10 +57,6 @@ Context-switching to a browser tab or social media destroys flow state. **WaitMa
 ---
 
 ## ✨ Features
-
-<p align="center">
-  <img src="assets/features-preview.jpg" alt="WaitMate Features Preview" width="100%" style="border-radius: 12px;" />
-</p>
 
 ### 1. 🔍 Zero-Config Universal AI Detection
 - **Native Antigravity & `agy` Watcher**: High-frequency real-time transcript monitoring (`120ms`) covering both the Antigravity IDE and the `agy` terminal CLI.
