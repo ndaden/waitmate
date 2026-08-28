@@ -1,4 +1,4 @@
-<h1 align="center">🤖 WaitMate</h1>
+<h1 align="center">WaitMate</h1>
 
 <p align="center">
   <strong>The floating desktop companion that turns AI waiting times into focused micro-breaks.</strong>
@@ -38,45 +38,45 @@
 
 ---
 
-## 💡 Why WaitMate?
+## Why WaitMate?
 
-When working with modern LLMs and agentic coding tools (**Antigravity**, **Claude Code**, **Ollama**, **Aider**), developers spend dozens of 15–60 second intervals waiting for answers, tool executions, and file diffs. 
+When working with modern LLMs and agentic coding tools (Antigravity, Claude Code, Ollama, Aider), developers spend dozens of 15–60 second intervals waiting for answers, tool executions, and file diffs. 
 
 Context-switching to a browser tab or social media destroys flow state. **WaitMate** stays discretely on your screen:
-- **Calm & Compact in Idle** (160×160 px circle in the corner of your screen).
-- **Auto-Deploys in Milliseconds** as soon as your AI starts thinking.
-- **Auto-Retracts Instantly** with zero delay the exact moment your answer is ready.
+- **Calm and compact in Idle**: 160×160 px circular companion in the corner of your screen.
+- **Auto-deploys in milliseconds** as soon as your AI starts thinking.
+- **Auto-retracts instantly** with zero delay the exact moment your answer is ready.
 
 ---
 
-## ✨ Features
+## Features
 
-### 1. 🔍 Zero-Config Universal AI Detection
-- **Native Antigravity & `agy` Watcher**: High-frequency real-time transcript monitoring (`120ms`) covering both the Antigravity IDE and the `agy` terminal CLI.
+### Universal AI Detection
+- **Native Antigravity and agy Watcher**: High-frequency real-time transcript monitoring (`120ms`) covering both the Antigravity IDE and the `agy` terminal CLI.
 - **CLI Process Scanner**: Automatically detects active terminal AI commands including `claude`, `ollama run`, `aider`, `gemini`, `llm`, and `sgpt`.
-- **Universal CLI Wrapper (`wm`)**: Prefix *any* custom terminal script or command with `wm` (e.g. `wm python script.py`, `wm curl ...`) to trigger WaitMate during execution.
-- **Zsh Shell Hook**: Seamless `preexec`/`precmd` hook integration for zero-effort shell triggering.
-- **HTTP Webhook API**: Simple local REST endpoint on port `9999` (`POST /start` & `POST /stop`).
+- **Universal CLI Wrapper (`wm`)**: Prefix custom terminal commands with `wm` (e.g. `wm python script.py`, `wm curl ...`) to trigger WaitMate during execution.
+- **Zsh Shell Hook**: `preexec`/`precmd` hook integration for zero-effort shell triggering.
+- **HTTP Webhook API**: Local REST endpoint on port `9999` (`POST /start` & `POST /stop`).
 
-### 2. 🐍 Snake Arcade
+### Snake Arcade
 - Responsive 2D retro canvas game with fluid controls (Arrow keys, `WASD`, `ZQSD`, or on-screen D-Pad).
 - Golden bonus apples (+30 pts), score multipliers, and persistent high-score tracking.
 
-### 3. 📺 Ambient YouTube Player
-- Type any keyword (e.g. `lofi`, `cats`, `f1`, `synthwave`, `gaming`) to launch a randomized ambient video.
-- **Anti-Repetition Engine**: Automatically excludes your last 50 viewed videos and diversifies search terms to guarantee a fresh video every time.
-- **Muted by Default**: Videos start silently so your music or environment isn't interrupted; toggle sound anytime with one click.
-- **Distraction-Free**: Player controls and interactive overlays are disabled for a clean, TV-like experience.
+### Ambient YouTube Player
+- Type any keyword (e.g. `lofi`, `cats`, `synthwave`, `gaming`) to launch a randomized ambient video.
+- **Anti-Repetition Engine**: Automatically excludes recently viewed videos and diversifies search terms to ensure a fresh video every time.
+- **Muted by Default**: Videos start silently to avoid interrupting your audio; toggle sound anytime with one click.
+- **Distraction-Free**: Interactive overlays and player controls are disabled for a clean experience.
 
-### 4. 🪶 Minimalist & Native macOS UX
+### Native macOS Experience
 - Transparent, frameless window with **Always-on-Top** support.
-- Fully draggable anywhere across your displays.
-- Automatic window focus upon expansion so you can immediately play with keyboard shortcuts without clicking first.
-- Matte obsidian aesthetic without fluorescent halos or distracting animations.
+- Fully draggable anywhere across displays.
+- Automatic window focus upon expansion so keyboard controls work immediately.
+- Menu Bar accessory without Dock clutter.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v18+)
@@ -105,7 +105,7 @@ npm run tauri build
 
 ---
 
-## 🐚 Terminal Integration
+## Terminal Integration
 
 ### 1. Universal `wm` CLI Wrapper
 A standalone wrapper script is provided in `~/.local/bin/wm`:
@@ -142,16 +142,17 @@ curl -X POST http://127.0.0.1:9999/stop \
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Framework**: [Tauri v2](https://tauri.app/) (Rust backend)
 - **Frontend**: [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Icons & Effects**: [Lucide React](https://lucide.dev/), [Canvas Confetti](https://github.com/catdad/canvas-confetti)
+- **Icons**: [Lucide React](https://lucide.dev/)
 - **System Monitoring**: `sysinfo` crate for low-overhead process tracking
 
 ---
 
-## 📄 License
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
+
