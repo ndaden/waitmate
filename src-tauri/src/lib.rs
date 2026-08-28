@@ -135,6 +135,8 @@ async fn search_random_youtube_video(query: String, excluded_ids: Option<Vec<Str
     let output_res = tokio::process::Command::new("curl")
         .arg("-s")
         .arg("-L")
+        .arg("--max-time")
+        .arg("3")
         .arg("-H")
         .arg("User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
         .arg(&url)

@@ -27,40 +27,54 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
   const [isMuted, setIsMuted] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [seenIds, setSeenIds] = useState<string[]>(() => {
+  const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Stocker seenIds dans une ref pour éviter les re-renders en boucle
+  const seenIdsRef = useRef<string[]>([]);
+
+  useEffect(() => {
     try {
       const saved = localStorage.getItem('waitmate_yt_seen');
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        seenIdsRef.current = JSON.parse(saved);
+      }
     } catch {
-      return [];
+      seenIdsRef.current = [];
     }
-  });
+  }, []);
 
   const fetchRandomVideo = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) return;
     setIsLoading(true);
     setHasError(false);
+
+    // Timeout de sécurité : si le chargement prend plus de 3.5s, on retire le spinner
+    if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
+    loadingTimerRef.current = setTimeout(() => {
+      setIsLoading(false);
+    }, 3500);
+
     try {
       const id = await invoke<string>('search_random_youtube_video', {
         query: searchQuery.trim(),
-        excludedIds: seenIds.slice(-40),
+        excludedIds: seenIdsRef.current.slice(-40),
       });
       if (id) {
         setVideoId(id);
-        setSeenIds((prev) => {
-          const next = [...prev.filter((item) => item !== id), id].slice(-50);
-          localStorage.setItem('waitmate_yt_seen', JSON.stringify(next));
-          return next;
-        });
+        const next = [...seenIdsRef.current.filter((item) => item !== id), id].slice(-50);
+        seenIdsRef.current = next;
+        localStorage.setItem('waitmate_yt_seen', JSON.stringify(next));
       }
     } catch (err) {
-      console.warn('Erreur de recherche YouTube:', err);
+      console.warn('Erreur recherche YouTube:', err);
       setVideoId('jfKfPfyJRdk');
     } finally {
       setIsLoading(false);
+      if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
     }
-  }, [seenIds]);
+  }, []);
 
+  // Déclencher la recherche uniquement lorsque activeQuery change
   useEffect(() => {
     if (activeQuery) {
       localStorage.setItem('waitmate_yt_query', activeQuery);
@@ -68,7 +82,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
     }
   }, [activeQuery, fetchRandomVideo]);
 
-  // Écouter les erreurs renvoyées par l'API YouTube iframe (Codes 100, 101, 150 = restrictions d'intégration)
+  // Écouter les erreurs renvoyées par l'API YouTube iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       try {
@@ -76,7 +90,6 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
         if (data?.event === 'onError' || (data?.event === 'infoDelivery' && data?.info?.errorCode)) {
           console.warn('[WaitMate YouTube] Erreur détectée dans le lecteur, passage à la vidéo suivante...', data);
           setHasError(true);
-          // Réessayer automatiquement avec une autre vidéo
           setTimeout(() => {
             fetchRandomVideo(activeQuery);
           }, 800);
@@ -93,18 +106,20 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (query.trim()) {
-      setActiveQuery(query.trim());
       if (query.trim() === activeQuery) {
         fetchRandomVideo(query.trim());
+      } else {
+        setActiveQuery(query.trim());
       }
     }
   };
 
   const handleSelectPreset = (presetQuery: string) => {
     setQuery(presetQuery);
-    setActiveQuery(presetQuery);
     if (presetQuery === activeQuery) {
       fetchRandomVideo(presetQuery);
+    } else {
+      setActiveQuery(presetQuery);
     }
   };
 
@@ -130,12 +145,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
     }
   };
 
-  // URL standard YouTube avec support d'origine propre
-  const originParam = typeof window !== 'undefined' && window.location.origin.startsWith('http')
-    ? encodeURIComponent(window.location.origin)
-    : 'https%3A%2F%2Fwww.youtube.com';
-
-  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&enablejsapi=1&playsinline=1&rel=0&origin=${originParam}`;
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&enablejsapi=1&playsinline=1&rel=0`;
 
   return (
     <div className="flex flex-col items-center w-full select-none animate-in fade-in duration-150">
@@ -215,6 +225,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
             title="YouTube Player"
             className="w-full h-full border-0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            onLoad={() => setIsLoading(false)}
           />
         ) : (
           <div className="flex flex-col items-center justify-center text-slate-500 space-y-1">
@@ -224,13 +235,13 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
         )}
 
         {isLoading && (
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center pointer-events-none">
             <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
           </div>
         )}
 
         {hasError && !isLoading && (
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-xs flex flex-col items-center justify-center text-slate-400 p-2 text-center space-y-1.5">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-xs flex flex-col items-center justify-center text-slate-400 p-2 text-center space-y-1.5 z-10">
             <AlertCircle className="w-5 h-5 text-amber-400" />
             <span className="text-[11px] text-slate-300">Video restricted on embed</span>
             <button
@@ -245,7 +256,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
         {/* Mute / Unmute Button */}
         <button
           onClick={toggleSound}
-          className="absolute bottom-2 right-2 p-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition-all cursor-pointer shadow-md active:scale-90 flex items-center space-x-1 text-[10px]"
+          className="absolute bottom-2 right-2 p-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition-all cursor-pointer shadow-md active:scale-90 flex items-center space-x-1 text-[10px] z-20"
           title={isMuted ? "Unmute sound" : "Mute sound"}
         >
           {isMuted ? (
