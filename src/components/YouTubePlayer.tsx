@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Video, Play, RotateCcw, X, Flame, Music, Sparkles, Loader2, Volume2, VolumeX, AlertCircle } from 'lucide-react';
+import { Search, Video, Play, RotateCcw, X, Flame, Music, Sparkles, Loader2, Volume2, VolumeX, AlertCircle, ExternalLink } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 
 interface YouTubePlayerProps {
@@ -145,7 +145,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
     }
   };
 
-  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&controls=0&disablekb=1&fs=0&iv_load_policy=3&playsinline=1&rel=0&enablejsapi=1`;
+  const embedUrl = `http://127.0.0.1:9999/yt?v=${encodeURIComponent(videoId)}&mute=${isMuted ? 1 : 0}`;
 
   return (
     <div className="flex flex-col items-center w-full select-none animate-in fade-in duration-150">
@@ -220,10 +220,11 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
         {videoId ? (
           <iframe
             ref={iframeRef}
-            key={videoId}
+            key={`${videoId}-${isMuted}`}
             src={embedUrl}
             title="YouTube Player"
             className="w-full h-full border-0 pointer-events-none"
+            referrerPolicy="strict-origin-when-cross-origin"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             onLoad={() => setIsLoading(false)}
           />
@@ -275,19 +276,32 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = () => {
 
       {/* Controls below player */}
       <div className="w-full mt-2 flex items-center justify-between px-1 text-[10px] text-slate-500">
-        <span className="truncate max-w-[190px] text-slate-400 font-mono">
+        <span className="truncate max-w-[150px] text-slate-400 font-mono">
           {activeQuery}
         </span>
 
-        <button
-          onClick={handleNextVideo}
-          disabled={isLoading}
-          className="flex items-center space-x-1 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer disabled:opacity-50"
-          title="Pick another random video"
-        >
-          <RotateCcw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
-          <span>Random video</span>
-        </button>
+        <div className="flex items-center space-x-2">
+          {videoId && (
+            <button
+              onClick={() => invoke('open_external_url', { url: `https://www.youtube.com/watch?v=${videoId}` })}
+              className="flex items-center space-x-1 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+              title="Open video on YouTube"
+            >
+              <ExternalLink className="w-3 h-3" />
+              <span>Watch</span>
+            </button>
+          )}
+
+          <button
+            onClick={handleNextVideo}
+            disabled={isLoading}
+            className="flex items-center space-x-1 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer disabled:opacity-50"
+            title="Pick another random video"
+          >
+            <RotateCcw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
+            <span>Random video</span>
+          </button>
+        </div>
       </div>
     </div>
   );

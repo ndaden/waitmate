@@ -55,6 +55,7 @@ pub async fn start_server(app_handle: AppHandle) {
         .route("/status", get(health_check))
         .route("/start", post(handle_start))
         .route("/stop", post(handle_stop))
+        .route("/yt", get(serve_youtube_player))
         .layer(cors)
         .with_state(state);
 
@@ -174,3 +175,56 @@ async fn handle_stop(
         }),
     )
 }
+
+#[derive(Debug, Deserialize)]
+pub struct YtQuery {
+    pub v: Option<String>,
+    pub mute: Option<u8>,
+}
+
+async fn serve_youtube_player(
+    axum::extract::Query(params): axum::extract::Query<YtQuery>,
+) -> impl IntoResponse {
+    let video_id = params.v.unwrap_or_else(|| "jfKfPfyJRdk".to_string());
+    let is_muted = params.mute.unwrap_or(1);
+
+    let html = format!(
+        r#"<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <style>
+    * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    html, body {{ width: 100%; height: 100%; overflow: hidden; background: #000; }}
+    iframe {{ width: 100%; height: 100%; border: none; display: block; }}
+  </style>
+</head>
+<body>
+  <iframe
+    id="yt"
+    src="https://www.youtube-nocookie.com/embed/{video_id}?autoplay=1&mute={is_muted}&controls=0&disablekb=1&fs=0&iv_load_policy=3&playsinline=1&rel=0&enablejsapi=1&origin=http://127.0.0.1:9999"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+  <script>
+    // Forward postMessage commands from parent (WaitMate) to YouTube iframe
+    window.addEventListener('message', function(e) {{
+      var yt = document.getElementById('yt');
+      if (yt && yt.contentWindow) {{
+        yt.contentWindow.postMessage(e.data, '*');
+      }}
+    }});
+  </script>
+</body>
+</html>"#
+    );
+
+    (
+        [(axum::http::header::CONTENT_TYPE, "text/html; charset=utf-8")],
+        html,
+    )
+}
+
