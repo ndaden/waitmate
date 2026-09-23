@@ -56,8 +56,14 @@ jobs:
               - Ambient YouTube player (muted by default) with video search and preset channels.
             - Universal auto-detection for terminal CLI tools (Claude Code, Ollama, Aider) and Antigravity IDE.
 
-            ### Installation
-            Download the `.dmg` file below, open it, and drag **WaitMate** into your **Applications** folder.
+            ### Installation (Contourner l'alerte de sécurité macOS)
+            Apple bloque par défaut les applications open-source non signées. Si macOS vous affiche un message d'erreur proposant uniquement de "Placer dans la corbeille" :
+            1. Téléchargez le `.dmg`, ouvrez-le et déplacez **WaitMate** dans votre dossier **Applications**.
+            2. Ouvrez votre **Terminal** et exécutez cette commande pour autoriser l'application :
+               ```bash
+               xattr -cr /Applications/WaitMate.app
+               ```
+            3. Vous pouvez maintenant lancer WaitMate normalement !
           releaseDraft: false
           prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
           args: ${{ matrix.args }}

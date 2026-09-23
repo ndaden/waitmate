@@ -98,6 +98,15 @@ npm run tauri dev
 npm run tauri build
 ```
 
+> **Note on macOS Security (Gatekeeper):** 
+> As an open-source project, WaitMate is not signed with a paid Apple Developer certificate. If macOS says the app is damaged and only offers to move it to the Trash:
+> 1. Move WaitMate to your **Applications** folder.
+> 2. Open your **Terminal** and run the following command to remove the quarantine flag:
+>    ```bash
+>    xattr -cr /Applications/WaitMate.app
+>    ```
+> 3. Launch WaitMate normally.
+
 ---
 
 ## Terminal Integration
